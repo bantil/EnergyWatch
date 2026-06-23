@@ -23,6 +23,12 @@ dependencies = [
     "jinja2>=3.1",
 ]
 
+[project.optional-dependencies]
+trading = [
+    "pydantic-ai>=0.3",
+    "anthropic>=0.40",
+]
+
 [project.scripts]
 energywatch = "energywatch.cli:cli"
 
