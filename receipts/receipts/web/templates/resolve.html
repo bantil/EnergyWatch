@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Resolve Prediction — Receipts{% endblock %}
+
+{% block content %}
+
+<div class="max-w-2xl">
+  <div class="mb-6">
+    <a href="/prediction/{{ pred.id }}" class="text-sm text-gray-400 hover:text-white transition-colors">← Back to prediction</a>
+  </div>
+
+  <h1 class="text-2xl font-bold text-white mb-4">Resolve Prediction</h1>
+
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
+    <p class="text-xs text-gray-400 mb-2">{{ pred.person.name }} · {{ pred.made_at }}{% if pred.deadline %} · deadline {{ pred.deadline }}{% endif %}</p>
+    <blockquote class="text-gray-200 border-l-4 border-indigo-500 pl-4">{{ pred.text }}</blockquote>
+  </div>
+
+  <form method="POST" action="/resolve/{{ pred.id }}" class="space-y-5">
+
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-2">Verdict <span class="text-red-400">*</span></label>
+      <div class="flex gap-3">
+        <label class="flex-1">
+          <input type="radio" name="verdict" value="correct" class="sr-only peer" required />
+          <div class="peer-checked:bg-green-500/20 peer-checked:border-green-500 bg-gray-900 border border-gray-700 rounded-lg p-3 text-center cursor-pointer hover:border-green-500/50 transition-colors">
+            <div class="text-xl mb-1">✅</div>
+            <div class="text-sm font-medium text-gray-300">Correct</div>
+          </div>
+        </label>
+        <label class="flex-1">
+          <input type="radio" name="verdict" value="incorrect" class="sr-only peer" />
+          <div class="peer-checked:bg-red-500/20 peer-checked:border-red-500 bg-gray-900 border border-gray-700 rounded-lg p-3 text-center cursor-pointer hover:border-red-500/50 transition-colors">
+            <div class="text-xl mb-1">❌</div>
+            <div class="text-sm font-medium text-gray-300">Incorrect</div>
+          </div>
+        </label>
+        <label class="flex-1">
+          <input type="radio" name="verdict" value="partial" class="sr-only peer" />
+          <div class="peer-checked:bg-yellow-500/20 peer-checked:border-yellow-500 bg-gray-900 border border-gray-700 rounded-lg p-3 text-center cursor-pointer hover:border-yellow-500/50 transition-colors">
+            <div class="text-xl mb-1">⚠️</div>
+            <div class="text-sm font-medium text-gray-300">Partial</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-1.5">
+        Actual Date <span class="text-gray-500 font-normal">(when did it happen?)</span>
+      </label>
+      <input type="date" name="actual_date"
+        class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500" />
+      <p class="text-xs text-gray-500 mt-1">Used to calculate how early/late the prediction was vs. the deadline.</p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-1.5">Evidence URL <span class="text-gray-500 font-normal">(optional)</span></label>
+      <input type="url" name="evidence_url" placeholder="https://…"
+        class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 placeholder-gray-600" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-1.5">Notes <span class="text-gray-500 font-normal">(optional)</span></label>
+      <textarea name="notes" rows="3" placeholder="Context or explanation…"
+        class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 resize-none placeholder-gray-600"></textarea>
+    </div>
+
+    <div class="pt-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">
+        Save Resolution
+      </button>
+      <a href="/prediction/{{ pred.id }}" class="ml-3 text-sm text-gray-400 hover:text-white transition-colors">Cancel</a>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

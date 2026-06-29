@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Prediction — Receipts{% endblock %}
+
+{% block content %}
+
+<div class="mb-6">
+  <a href="/person/{{ pred.person.id }}" class="text-sm text-gray-400 hover:text-white transition-colors">
+    ← {{ pred.person.name }}
+  </a>
+</div>
+
+<div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <span class="text-xs px-2.5 py-1 rounded-full font-medium
+        {% if pred.status == 'correct' %}bg-green-500/20 text-green-400 border border-green-500/30
+        {% elif pred.status == 'incorrect' %}bg-red-500/20 text-red-400 border border-red-500/30
+        {% elif pred.status == 'partial' %}bg-yellow-500/20 text-yellow-400 border border-yellow-500/30
+        {% elif pred.status == 'expired' %}bg-orange-500/20 text-orange-400 border border-orange-500/30
+        {% else %}bg-gray-700 text-gray-300 border border-gray-600{% endif %}">
+        {{ pred.status | upper }}
+      </span>
+      <span class="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded">{{ pred.category }}</span>
+    </div>
+    {% if pred.confidence_pct %}
+    <span class="text-xs text-gray-400">{{ pred.confidence_pct | round(0) | int }}% confidence stated</span>
+    {% endif %}
+  </div>
+
+  <blockquote class="text-lg text-white leading-relaxed border-l-4 border-indigo-500 pl-4 mb-5">
+    {{ pred.text }}
+  </blockquote>
+
+  <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+    <span>
+      By <a href="/person/{{ pred.person.id }}" class="text-indigo-400 hover:text-indigo-300">{{ pred.person.name }}</a>
+      {% if pred.person.handle %}<span class="text-gray-500">(@{{ pred.person.handle }})</span>{% endif %}
+    </span>
+    <span>Made: <span class="text-gray-300">{{ pred.made_at }}</span></span>
+    {% if pred.deadline %}<span>Deadline: <span class="text-gray-300">{{ pred.deadline }}</span></span>{% endif %}
+    <span>Source: <span class="text-gray-300">{{ pred.source_type }}</span></span>
+  </div>
+
+  {% if pred.source_url %}
+  <a href="{{ pred.source_url }}" target="_blank" class="inline-block mt-3 text-xs text-indigo-400 hover:text-indigo-300 underline underline-offset-2">
+    View source →
+  </a>
+  {% elif pred.source_description %}
+  <p class="mt-3 text-xs text-gray-500 italic">{{ pred.source_description }}</p>
+  {% endif %}
+
+  {% if pred.market_url %}
+  <a href="{{ pred.market_url }}" target="_blank" class="inline-flex items-center gap-1 mt-3 ml-4 text-xs text-purple-400 hover:text-purple-300">
+    📈 View prediction market →
+  </a>
+  {% endif %}
+</div>
+
+{% if pred.outcome %}
+<div class="bg-gray-900 border {% if pred.outcome.verdict == 'correct' %}border-green-500/40{% elif pred.outcome.verdict == 'incorrect' %}border-red-500/40{% else %}border-yellow-500/40{% endif %} rounded-xl p-5 mb-6">
+  <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Outcome</h2>
+  <div class="flex items-center gap-3 mb-3">
+    <span class="text-lg font-bold
+      {% if pred.outcome.verdict == 'correct' %}text-green-400
+      {% elif pred.outcome.verdict == 'incorrect' %}text-red-400
+      {% else %}text-yellow-400{% endif %}">
+      {% if pred.outcome.verdict == 'correct' %}✅ Correct
+      {% elif pred.outcome.verdict == 'incorrect' %}❌ Incorrect
+      {% else %}⚠️ Partial{% endif %}
+    </span>
+    {% if delta is not none %}
+    <span class="text-sm px-2.5 py-1 rounded-full font-mono
+      {% if delta <= 0 %}bg-green-500/20 text-green-400{% else %}bg-red-500/20 text-red-400{% endif %}">
+      {{ fmt_delta(delta) }}
+    </span>
+    {% endif %}
+  </div>
+  {% if pred.outcome.actual_date %}
+  <p class="text-sm text-gray-400 mb-2">Resolved on: <span class="text-gray-200">{{ pred.outcome.actual_date }}</span></p>
+  {% endif %}
+  {% if pred.outcome.notes %}
+  <p class="text-sm text-gray-300 mb-3">{{ pred.outcome.notes }}</p>
+  {% endif %}
+  {% if pred.outcome.evidence_url %}
+  <a href="{{ pred.outcome.evidence_url }}" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline underline-offset-2">
+    View evidence →
+  </a>
+  {% endif %}
+</div>
+{% else %}
+{% if pred.status in ['pending', 'expired'] %}
+<div class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
+  <p class="text-gray-400 text-sm mb-3">This prediction hasn't been resolved yet.</p>
+  <a href="/resolve/{{ pred.id }}" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors">
+    Resolve Prediction
+  </a>
+</div>
+{% endif %}
+{% endif %}
+
+{% endblock %}
